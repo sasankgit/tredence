@@ -2,9 +2,11 @@ import { useEffect, useRef } from 'react';
 
 function sampleImagePoints(img, maxPoints, canvasW, canvasH) {
   const off = document.createElement('canvas');
-  const scale = Math.min(canvasW / img.naturalWidth, canvasH / img.naturalHeight) * 0.7;
-  off.width  = Math.floor(img.naturalWidth  * scale);
-  off.height = Math.floor(img.naturalHeight * scale);
+  const w = img.naturalWidth || img.width || 500;
+  const h = img.naturalHeight || img.height || 500;
+  const scale = Math.min(canvasW / w, canvasH / h) * 0.75;
+  off.width  = Math.floor(w * scale);
+  off.height = Math.floor(h * scale);
 
   const octx = off.getContext('2d');
   octx.drawImage(img, 0, 0, off.width, off.height);
@@ -16,9 +18,11 @@ function sampleImagePoints(img, maxPoints, canvasW, canvasH) {
     for (let x = 0; x < off.width; x++) {
       const i = (y * off.width + x) * 4;
       const a = data[i + 3];
-      if (a > 60) {
+      // SVGs often have clean edges, lowered alpha threshold to 40
+      if (a > 40) {
         const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
-        if (brightness > 30 || a > 120) raw.push({ x, y });
+        // Accept points if they are not too dark or have high alpha
+        if (brightness > 20 || a > 100) raw.push({ x, y });
       }
     }
   }
@@ -46,7 +50,7 @@ export default function ParticleBackground({ imageSrc = '/bg.png' }) {
     let imageLoaded = false;
     let morphProgress = 0;
     let morphDir = 1;
-    const MAX_PARTICLES = 8000;
+    const MAX_PARTICLES = 1500;
 
     canvas.width  = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -57,7 +61,8 @@ export default function ParticleBackground({ imageSrc = '/bg.png' }) {
       imageTargets = sampleImagePoints(img, MAX_PARTICLES, canvas.width, canvas.height);
       imageLoaded = true;
       initParticles();
-      setInterval(() => { morphDir = morphDir === 1 ? -1 : 1; }, 4000);
+      const interval = setInterval(() => { morphDir = morphDir === 1 ? -1 : 1; }, 6000);
+      return () => clearInterval(interval);
     };
     img.onerror = () => {
       imageLoaded = false;
@@ -68,7 +73,7 @@ export default function ParticleBackground({ imageSrc = '/bg.png' }) {
     const initParticles = () => {
       const count = imageLoaded
         ? Math.min(imageTargets.length, MAX_PARTICLES)
-        : Math.floor((canvas.width * canvas.height) / 7000);
+        : Math.floor((canvas.width * canvas.height) / 15000);
 
       particles = Array.from({ length: count }, (_, i) => {
         const target = imageTargets[i] || null;
@@ -88,18 +93,25 @@ export default function ParticleBackground({ imageSrc = '/bg.png' }) {
     };
 
     const drawConnections = () => {
+      if (morphProgress > 0.8) return;
+      
+      ctx.lineWidth = 0.5;
+      const maxDistSq = 80 * 80;
+      
       for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
         for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const d  = Math.sqrt(dx * dx + dy * dy);
-          if (d < 90) {
-            const alpha = (1 - d / 90) * 0.1 * (1 - morphProgress * 0.7);
+          const p2 = particles[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const distSq = dx * dx + dy * dy;
+          
+          if (distSq < maxDistSq) {
+            const alpha = (1 - distSq / maxDistSq) * 0.08 * (1 - morphProgress);
             ctx.beginPath();
             ctx.strokeStyle = `rgba(220,38,38,${alpha})`;
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
           }
         }

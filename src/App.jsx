@@ -12,7 +12,7 @@ export default function App() {
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col font-body">
       {/* Change "/bg.png" to whatever your image is named inside the /public folder */}
-      <ParticleBackground imageSrc="/bg.png" />
+      <ParticleBackground imageSrc="/tren.svg" />
 
       <div className="relative z-10 flex flex-col h-full">
         <Toolbar />
