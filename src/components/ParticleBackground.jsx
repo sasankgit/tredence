@@ -36,7 +36,7 @@ function sampleImagePoints(img, maxPoints, canvasW, canvasH) {
   return reduced.map(p => ({ x: p.x + offsetX, y: p.y + offsetY }));
 }
 
-export default function ParticleBackground({ imageSrc = '/bg.png' }) {
+export default function ParticleBackground({ imageSrc = '/tren.svg', maxParticles = 900 }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function ParticleBackground({ imageSrc = '/bg.png' }) {
     let imageLoaded = false;
     let morphProgress = 0;
     let morphDir = 1;
-    const MAX_PARTICLES = 1500;
+    const MAX_PARTICLES = maxParticles;
 
     canvas.width  = window.innerWidth;
     canvas.height = window.innerHeight;
