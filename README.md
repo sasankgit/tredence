@@ -1,89 +1,180 @@
-# HR Workflow Designer — Tredence Case Study
+# HR Workflow Designer — Tredence Full Stack Case Study
 
-A full-stack React prototype for visually designing and simulating HR workflows.
+Dear Tredence Hiring Team,
 
-## Tech Stack
-- **React 18** + **Vite** (no TypeScript — plain JS)
-- **ReactFlow v11** — drag-and-drop workflow canvas
-- **Zustand** — global state with undo/redo history
-- **Tailwind CSS** — utility-first styling
-- **Firebase Firestore** — optional workflow persistence
-- **Canvas API** — animated particle background
+This submission is a functional prototype of an **HR Workflow Designer Module**, built as part of your Full Stack Engineering Intern case study.
+The goal was to design a scalable, modular system that allows HR teams to visually create, configure, and simulate internal workflows.
 
-## Features
-- 5 node types: Start, Task, Approval, Automated Step, End
-- Drag nodes from sidebar onto canvas
-- Click any node to open its edit form (dynamic, per-type)
-- Connect nodes with animated red edges
-- Delete nodes/edges (select → Delete key, or panel button)
-- Workflow simulation with BFS execution & validation
-  - Detects: missing start/end, cycles, disconnected nodes
-- Export / Import workflow as JSON
-- Save to Firebase Firestore (requires env vars)
-- Undo / Redo (30-step history)
+The application is fully working and deployed.
 
-## Folder Structure
+👉 **Live Demo (Vercel):** *[Add your link here]*
+I encourage you to try building and simulating workflows directly.
+
+---
+
+## 🚀 Overview
+
+This project enables HR admins to:
+
+* Visually design workflows using a drag-and-drop canvas
+* Configure each step dynamically
+* Validate workflow structure
+* Simulate execution in a sandbox environment
+
+It focuses on **clean architecture, scalability, and real-world usability**, rather than just UI rendering.
+
+---
+
+## 🧰 Tech Stack
+
+### Frontend
+
+* **React 18 (Vite)** — fast, modern build setup
+* **React Flow v11** — graph-based workflow canvas
+* **Zustand** — lightweight global state + undo/redo history
+* **Tailwind CSS** — utility-first styling
+
+### Backend / Data Layer
+
+* **Mock API Layer** — async abstraction for workflows
+* **Firebase Firestore (optional)** — workflow persistence
+
+### Additional Integrations
+
+* **Gemini API (Google AI)** — integrated for AI-assisted workflow suggestions
+* **Canvas API** — animated particle background (custom-built, no libraries)
+
+---
+
+## 🌐 Live Deployment
+
+The application is deployed on **Vercel** for easy access and testing.
+
+👉 **Live URL:** https://tredence-eosin.vercel.app/
+
+* No setup required
+* Fully functional in browser
+* Firebase features activate if env variables are provided
+
+---
+
+## ✨ Features
+
+### Workflow Builder
+
+* 5 node types:
+
+  * Start
+  * Task
+  * Approval
+  * Automated Step
+  * End
+* Drag-and-drop node creation
+* Connect nodes with animated edges
+* Delete nodes and edges
+
+### Dynamic Node Configuration
+
+* Each node has a **custom editable form**
+* Controlled inputs with scalable structure
+* Easily extendable for new node types
+
+### Workflow Simulation Engine
+
+* BFS-based execution (not linear)
+* Validation checks:
+
+  * Missing Start/End
+  * Cycles
+  * Disconnected nodes
+* Step-by-step execution log
+
+### State Management
+
+* Global state using **Zustand**
+* Undo/Redo (30-step history)
+
+### Data Handling
+
+* Export / Import workflow as JSON
+* Optional Firebase Firestore persistence
+
+### AI Integration
+
+* Gemini API integrated for:
+
+  * Workflow suggestions
+  * Future extensibility into intelligent automation
+
+---
+
+## 📁 Project Structure
+
 ```
 src/
   api/
-    mockApi.js          # Mock GET /automations, POST /simulate, Firebase helpers
+    mockApi.js
   components/
     nodes/
-      WorkflowNodes.jsx # All 5 custom ReactFlow node renderers
     panels/
-      NodeSidebar.jsx   # Draggable node library
-      NodeEditPanel.jsx # Per-type config forms
-      SimulationPanel.jsx # Sandbox modal
-      Toolbar.jsx       # Top bar (name, undo, export, simulate)
-    ParticleBackground.jsx # Canvas particle system
-    WorkflowCanvas.jsx  # ReactFlow canvas + drop logic
+    WorkflowCanvas.jsx
+    ParticleBackground.jsx
   store/
-    workflowStore.js    # Zustand store
-  firebase.js           # Firebase init (reads .env)
+    workflowStore.js
+  firebase.js
   App.jsx
   main.jsx
-  index.css
 ```
 
-## Running Locally
-```bash
-npm install
-npm run dev
-```
+---
 
-## Environment Variables (optional — for Firebase)
-Create `.env` at project root:
-```
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=...
-VITE_FIREBASE_PROJECT_ID=...
-VITE_FIREBASE_STORAGE_BUCKET=...
-VITE_FIREBASE_MESSAGING_SENDER_ID=...
-VITE_FIREBASE_APP_ID=...
-```
+## 🧠 Design Decisions
 
-If Firebase env vars are absent, the app runs fully in local/mock mode.
+* **Zustand over Redux/Context**
+  Minimal boilerplate with high performance and clean state separation
 
-## Gemini API (optional)
-Add `VITE_GEMINI_API_KEY=...` to `.env` and call the Gemini REST endpoint from `mockApi.js` for AI-assisted workflow suggestions.
+* **Component Modularity**
+  Clear separation of:
 
-## Adding a New Node Type
-1. Add its default data shape to `NodeSidebar.jsx`
-2. Add a `Form` component in `NodeEditPanel.jsx` and register it in `FORM_MAP`
-3. Add a visual style entry in `WorkflowNodes.jsx` → `nodeStyles`
-4. Register it in `nodeTypes` and ReactFlow's `nodeTypes` prop
+  * Canvas logic
+  * Node rendering
+  * Form handling
+  * API layer
 
-## Design Decisions
-- **No TypeScript** — plain JS for speed, consistent with the brief's flexibility
-- **Zustand over Context/Redux** — minimal boilerplate, built-in selector memoisation
-- **Mock API as plain async functions** — swappable for real endpoints with no component changes
-- **BFS simulation** — faithfully traverses the directed graph rather than a naive linear scan
-- **Particle canvas** — Canvas 2D API with mouse-repulsion, glow halos, and connection lines; zero dependencies
+* **Scalable Node System**
+  New node types can be added with minimal changes
 
-## What I'd Add With More Time
-- Cypress E2E tests + Jest unit tests for BFS/validation logic
-- Real-time collaboration via Firebase RTDB
-- Node version history + comment threads
-- AI-assisted node suggestions via Gemini
-- Drag-to-reorder node library
-- Role-based access control with Firebase Auth
+* **Graph-based Simulation (BFS)**
+  Ensures correctness over naive sequential execution
+
+* **Mock API Abstraction**
+  Easily replaceable with real backend services
+
+---
+
+## 🔮 Future Enhancements
+
+With more time, I would extend this into a production-grade system by adding:
+
+* Real-time collaboration (Firebase RTDB / WebSockets)
+* Role-based access control (Firebase Auth)
+* Node version history and audit logs
+* Visual validation indicators on nodes
+* AI-powered workflow generation using Gemini
+* E2E testing (Cypress) + unit tests (Jest)
+
+---
+
+## 🙌 Closing Note
+
+This project reflects my approach to:
+
+* Building scalable frontend systems
+* Structuring complex state and workflows
+* Delivering functional features within time constraints
+
+I focused on **clarity, extensibility, and real-world applicability**, aligning with the expectations outlined in the case study.
+
+Thank you for your time and consideration.
+
+— Sasank
