@@ -1,0 +1,36 @@
+import ParticleBackground from './components/ParticleBackground.jsx';
+import Toolbar from './components/panels/Toolbar.jsx';
+import NodeSidebar from './components/panels/NodeSidebar.jsx';
+import WorkflowCanvas from './components/WorkflowCanvas.jsx';
+import NodeEditPanel from './components/panels/NodeEditPanel.jsx';
+import SimulationPanel from './components/panels/SimulationPanel.jsx';
+import { useWorkflowStore } from './store/workflowStore.js';
+
+export default function App() {
+  const selectedNodeId = useWorkflowStore(s => s.selectedNodeId);
+
+  return (
+    <div className="h-screen w-screen overflow-hidden flex flex-col font-body">
+      {/* Animated particle canvas behind everything */}
+      <ParticleBackground />
+
+      {/* App layer */}
+      <div className="relative z-10 flex flex-col h-full">
+        <Toolbar />
+
+        <div className="flex flex-1 overflow-hidden gap-0">
+          <NodeSidebar />
+
+          <main className="flex-1 relative overflow-hidden">
+            <WorkflowCanvas />
+          </main>
+
+          {selectedNodeId && <NodeEditPanel />}
+        </div>
+      </div>
+
+      {/* Simulation modal */}
+      <SimulationPanel />
+    </div>
+  );
+}
