@@ -11,14 +11,13 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col font-body">
-      {/* Animated particle canvas behind everything */}
-      <ParticleBackground />
+      {/* Change "/bg.png" to whatever your image is named inside the /public folder */}
+      <ParticleBackground imageSrc="/bg.png" />
 
-      {/* App layer */}
       <div className="relative z-10 flex flex-col h-full">
         <Toolbar />
 
-        <div className="flex flex-1 overflow-hidden gap-0">
+        <div className="flex flex-1 overflow-hidden">
           <NodeSidebar />
 
           <main className="flex-1 relative overflow-hidden">
@@ -29,7 +28,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Simulation modal */}
       <SimulationPanel />
     </div>
   );

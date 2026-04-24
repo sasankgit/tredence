@@ -4,6 +4,8 @@ import ReactFlow, {
   Controls,
   MiniMap,
   BackgroundVariant,
+  useReactFlow,
+  ReactFlowProvider,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useWorkflowStore } from '../store/workflowStore.js';
@@ -12,15 +14,16 @@ import { getAutomations } from '../api/mockApi.js';
 
 let nodeCounter = 1;
 
-export default function WorkflowCanvas() {
+function CanvasInner() {
   const reactFlowWrapper = useRef(null);
+  const { screenToFlowPosition } = useReactFlow();
+
   const {
     nodes, edges,
     onNodesChange, onEdgesChange, onConnect,
     setSelectedNodeId, addNode, setAutomations,
   } = useWorkflowStore();
 
-  // Load automations on mount
   useEffect(() => {
     getAutomations().then(setAutomations);
   }, [setAutomations]);
@@ -44,22 +47,17 @@ export default function WorkflowCanvas() {
     const rawData = e.dataTransfer.getData('application/reactflow-data');
     if (!type || !rawData) return;
 
-    const bounds = reactFlowWrapper.current.getBoundingClientRect();
-    // Basic position — ReactFlow will handle snapping
-    const position = {
-      x: e.clientX - bounds.left - 90,
-      y: e.clientY - bounds.top - 30,
-    };
+    const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
 
     let data;
     try { data = JSON.parse(rawData); } catch { return; }
 
-    const id = `${type}-${++nodeCounter}`;
+    const id = `${type}-${Date.now()}-${++nodeCounter}`;
     addNode({ id, type, position, data });
-  }, [addNode]);
+  }, [addNode, screenToFlowPosition]);
 
   return (
-    <div ref={reactFlowWrapper} className="flex-1 relative">
+    <div ref={reactFlowWrapper} className="flex-1 relative w-full h-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -100,9 +98,8 @@ export default function WorkflowCanvas() {
         />
       </ReactFlow>
 
-      {/* Empty state hint */}
       {nodes.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
           <div className="text-center">
             <div className="w-16 h-16 rounded-2xl bg-red-950/40 border border-red-800/30 flex items-center justify-center mx-auto mb-4">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(220,38,38,0.6)" strokeWidth="1.5">
@@ -116,5 +113,13 @@ export default function WorkflowCanvas() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function WorkflowCanvas() {
+  return (
+    <ReactFlowProvider>
+      <CanvasInner />
+    </ReactFlowProvider>
   );
 }
